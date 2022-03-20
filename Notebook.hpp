@@ -1,21 +1,24 @@
 #ifndef NOTEBOOK_CPP
 #define NOTEBOOK_CPP
 
-#include<map>
-#include<vector>
-#include<string>
+#include <map>
+#include <vector>
+#include <string>
 #include "Direction.hpp"
-struct Page{
-    unsigned long min_row;
-    unsigned long max_row;
-    int min_col;
-    int max_col;
-    Page (){
-        min_row = (unsigned long) -1;
-        max_row = (unsigned long) -1;
-        min_col = 100;
-        max_col = 0;
-    }
-};
-namespace ariel 
+#include "Page.hpp"
+using ariel::Direction;
+namespace ariel
+{
+    class Notebook
+    {
+    private:
+        static char _empty_char;
+        std::map<unsigned int,Page> notebook;
+    public:
+        void write(unsigned int page_num, unsigned int row_num, unsigned int col_num, Direction direction, std::string s);
+        std::string read(unsigned int page_num, unsigned int row_num, unsigned int col_num, Direction direction, unsigned int length);
+        void erase(unsigned int page_num, unsigned int row_num, unsigned int col_num, Direction direction, unsigned int length);
+        void show(unsigned int page_num);
+    };
+}
 #endif
