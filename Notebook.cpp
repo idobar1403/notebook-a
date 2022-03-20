@@ -41,14 +41,14 @@ namespace ariel
             }
         }
     }
-    std::string read(unsigned int page_num, unsigned int row_num, unsigned int col_num, Direction direction, unsigned int length)
+    std::string Notebook::read(unsigned int page_num, unsigned int row_num, unsigned int col_num, Direction direction, unsigned int length)
     {
         return "hi";
     }
-    void erase(unsigned int page_num, unsigned int row_num, unsigned int col_num, Direction direction, unsigned int length)
+    void Notebook::erase(unsigned int page_num, unsigned int row_num, unsigned int col_num, Direction direction, unsigned int length)
     {
     }
-    void show(unsigned int page_num)
+    void Notebook::show(unsigned int page_num)
     {
     }
 }
