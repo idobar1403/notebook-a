@@ -43,7 +43,7 @@ namespace ariel
     }
     std::string Notebook::read(unsigned int page_num, unsigned int row_num, unsigned int col_num, Direction direction, unsigned int length)
     {
-        return "hi";
+        return " ";
     }
     void Notebook::erase(unsigned int page_num, unsigned int row_num, unsigned int col_num, Direction direction, unsigned int length)
     {
