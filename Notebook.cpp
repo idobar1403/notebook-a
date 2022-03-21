@@ -12,7 +12,7 @@ namespace ariel
             this->notebook.at(page_num).note[col][row] = c;
         }
         catch(const std::exception& e){
-            cout<<"exception at line 15";
+            cout<<"exception at line 15\n";
         }
     }
     char Notebook::getChar(unsigned int page_num, unsigned int row, unsigned int col)
@@ -23,12 +23,11 @@ namespace ariel
             {
                 return this->notebook.at(page_num).note[col].at(row);
             }
-            std::cout << empty_char;
             return Notebook::empty_char;
         }
         catch (const std::exception &e)
         {
-            cout << "error at line 25";
+            cout << "error at line 25\n";
             return '_';
         }
     }
@@ -63,7 +62,7 @@ namespace ariel
         }
         catch (const std::exception &e)
         {
-            cout << "exception at line 59";
+            cout << "exception at line 59\n";
         }
     }
     void Notebook::write(unsigned int page_num, unsigned int row_num, unsigned int col_num, Direction direction, std::string s)
@@ -84,14 +83,13 @@ namespace ariel
                 {
                     if (getChar(page_num, row_num, col_num + i) != '_')
                     {
-                        cout << getChar(page_num, row_num, col_num + i);
-                        throw invalid_argument("cannot reach the given place in the notebook");
+                        throw invalid_argument("cannot reach the given place in the notebook\n");
                     }
                 }
             }
             catch (const std::exception &e)
             {
-                cout << "exception at line 88";
+                cout << "exception at line 88\n";
             }
             try
             {
@@ -103,7 +101,7 @@ namespace ariel
             }
             catch (const std::exception &e)
             {
-                cout << "exception at line 101";
+                cout << "exception at line 101\n";
             }
         }
         else
@@ -114,14 +112,13 @@ namespace ariel
                 {
                     if (getChar(page_num, row_num + i, col_num) != '_')
                     {
-                        cout << getChar(page_num, row_num + i, col_num);
-                        throw invalid_argument("has char at this place");
+                        throw invalid_argument("cannot override already written char\n");
                     }
                 }
             }
             catch (const std::exception &e)
             {
-                cout << "has char at this place";
+                cout << "cannot override already written char\n";
                 return;
             }
             try
@@ -134,20 +131,20 @@ namespace ariel
             }
             catch (const std::exception &e)
             {
-                cout << "exception at line 131";
+                cout << "exception at line 131\n";
             }
         }
     }
     std::string Notebook::read(unsigned int page_num, unsigned int row_num, unsigned int col_num, Direction direction, unsigned int length)
     {
         if(length<lower_bound || (length>upper_bound && direction == Direction::Horizontal)){
-            throw invalid_argument("length must be between 0 to 100");
+            throw invalid_argument("length must be between 0 to 100\n");
         }
         if(col_num<lower_bound || col_num>upper_bound || row_num<lower_bound){
-            throw invalid_argument("rows and cols must be valid arguments!");
+            throw invalid_argument("rows and cols must be valid arguments!\n");
         }
         if(length+col_num>upper_bound && direction == Direction::Horizontal){
-            throw invalid_argument("can't reach to column greater than 100");
+            throw invalid_argument("can't reach to column greater than 100\n");
         }
         std::string sentance;
         if(this->notebook.count(page_num)==0){
@@ -170,16 +167,16 @@ namespace ariel
     {
         
         if(length<lower_bound || (length>upper_bound && direction == Direction::Horizontal)){
-            throw invalid_argument("length must be between 0 to 100");
+            throw invalid_argument("length must be between 0 to 100\n");
         }
         if(col_num<lower_bound || col_num>upper_bound || row_num<lower_bound){
-            throw invalid_argument("rows and cols must be valid arguments!");
+            throw invalid_argument("rows and cols must be valid arguments!\n");
         }
         if(length+col_num>upper_bound && direction == Direction::Horizontal){
-            throw invalid_argument("can't reach to column greater than 100");
+            throw invalid_argument("can't reach to column greater than 100\n");
         }
         if(this->notebook.count(page_num)==0){
-            throw invalid_argument("can't erase from no exsiting page");
+            throw invalid_argument("can't erase from no exsiting page\n");
         }
         if(direction==Direction::Vertical){
             for(unsigned int i=0; i<length; i++){
