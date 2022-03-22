@@ -1,61 +1,73 @@
 #include "doctest.h"
 #include "Notebook.hpp"
+#include "Direction.hpp"
 using namespace ariel;
-
+#include <iostream>
 #include <string>
-#include <algorithm>
 using namespace std;
-TEST_CASE("Good input"){
-	CHECK(nospaces(mat(9, 7, '@', '-')) == nospaces("@@@@@@@@@\n"
-													"@-------@\n"
-													"@-@@@@@-@\n"
-													"@-@---@-@\n"
-													"@-@@@@@-@\n"
-													"@-------@\n"
-													"@@@@@@@@@"));
-    CHECK(nospaces(mat(1,1,'#','-'))==nospaces("#"));
-    CHECK(nospaces(mat(5,13,'@','-'))==nospaces("@@@@@\n"
-                                                "@---@\n"
-                                                "@-@-@\n"
-                                                "@-@-@\n"
-                                                "@-@-@\n"
-                                                "@-@-@\n"
-                                                "@-@-@\n"
-                                                "@-@-@\n"
-                                                "@-@-@\n"
-                                                "@-@-@\n"
-                                                "@-@-@\n"
-                                                "@---@\n"
-                                                "@@@@@"));
-    CHECK(nospaces(mat(1,3,'?','-'))==nospaces("?\n"
-                                               "?\n"
-                                               "?"));
-    CHECK(nospaces(mat(3,1,'?','-'))==nospaces("???"));
-    CHECK(nospaces(mat(3,3,'c','='))==nospaces("ccc\n"
-                                               "c=c\n"
-                                               "ccc"));
-    CHECK(nospaces(mat(3,5,'?','!'))==nospaces("???\n"
-                                               "?!?\n"
-                                               "?!?\n"
-                                               "?!?\n"
-                                               "???"));
-    CHECK(nospaces(mat(5,5,'?','?'))==nospaces("?????\n"
-                                               "?????\n"
-                                               "?????\n"
-                                               "?????\n"
-                                               "?????"));
+TEST_CASE("Good Writing and reading tests")
+{
+    ariel::Notebook notebook;
+    CHECK_NOTHROW(notebook.write(0, 0, 2, Direction::Horizontal, "good test"));// simple write
+    CHECK(notebook.read(0, 0, 2, Direction::Horizontal, 9) == "good test");// simple read
+    CHECK(notebook.read(0, 0, 2, Direction::Vertical, 9) == "g________");// simple vertical read
+    CHECK_NOTHROW(notebook.write(100, 20, 99, Direction::Vertical, "vertical string"));// vertical write at edge of row
+    CHECK(notebook.read(100, 20, 99, Direction::Vertical, 15) == "vertical string");// vertical read at edge of row
+    CHECK(notebook.read(100, 19, 99, Direction::Vertical, 17) == "_vertical string_");// read also non-writen entries
+    CHECK(notebook.read(100, 20, 98, Direction::Horizontal, 2) == "_v");// read horizontally vertically written string
+    CHECK_NOTHROW(notebook.write(20000, 2900, 0, Direction::Horizontal, "")); // write empty string
+    CHECK_NOTHROW(notebook.write(20000, 2900, 99, Direction::Horizontal, "1")); // check that get no errors on writing on edge
+    CHECK(notebook.read(20000, 2900, 0, Direction::Horizontal, 3) == "___"); // read non written entries
 }
-TEST_CASE("Bad inputs") {
-    CHECK_THROWS(mat(10, 5, '$', '%'));
-    CHECK_THROWS(mat(0, 0, 'x', 'y'));
-    CHECK_THROWS(mat(3, -3, '$', '-'));
-    CHECK_THROWS(mat(5, 5, '$', ' '));
-    CHECK_THROWS(mat(5, 5, '\n', '^'));
-    CHECK_THROWS(mat(3, 1, '@', '\r'));
-    CHECK_THROWS(mat(1, 5, 'Q', '\t'));
-    CHECK_THROWS(mat(-1, 9, '$', ')'));
-    CHECK_THROWS(mat(9, -7, '-', '*'));
-    CHECK_THROWS(mat(2, 2, '!', '$'));
-    CHECK_THROWS(mat(3, 7, ' ', '@'));
-    CHECK_THROWS(mat(-1, -3, '%', '$'));
+TEST_CASE("Good erase tests")
+{
+    ariel::Notebook notebook;
+    CHECK_NOTHROW(notebook.write(0, 0, 2, Direction::Horizontal, "good test")); // simple write
+    CHECK_NOTHROW(notebook.write(100, 20, 99, Direction::Vertical, "vertical string")); //simple write
+    CHECK_NOTHROW(notebook.write(20000, 2900, 0, Direction::Horizontal, "")); // simple write
+    CHECK_NOTHROW(notebook.erase(0, 0, 2, Direction::Horizontal, 3)); // erase some chars
+    CHECK(notebook.read(0, 0, 2, Direction::Horizontal, 9) == "~~~d test"); // check that it's actually got deleted
+    CHECK_NOTHROW(notebook.erase(0, 0, 2, Direction::Horizontal, 3));// erase some chars
+    CHECK(notebook.read(0, 0, 2, Direction::Horizontal, 9) == "~~~d test"); // check that it's actually got deleted
+    CHECK(notebook.read(0, 0, 2, Direction::Vertical, 3) == "~__"); // check that it's actually got deleted
+    CHECK_NOTHROW(notebook.erase(100, 20, 99, Direction::Vertical, 14)); // erase some chars
+    CHECK(notebook.read(100, 20, 99, Direction::Vertical, 15) == "~~~~~~~~~~~~~~g"); //check that it's actually got deleted
+    std::string s;
+    for (int i = 0; i < 40; i++)
+    {
+        s += '~';
+    }
+    CHECK_NOTHROW(notebook.erase(1000, 30, 50, Direction::Vertical, 40)); // erase big amount of chars
+    CHECK(notebook.read(1000, 30, 50, Direction::Vertical, 40) == s); //check that it's actually got deleted
+    CHECK_NOTHROW(notebook.erase(30, 10, 90, Direction::Horizontal, 10)); // erase some chars
+    CHECK(notebook.read(30, 10, 90, Direction::Horizontal, 10) == "~~~~~~~~~~"); // check that it's actually got deleted
+}
+TEST_CASE("Bad inputs")
+{
+    ariel::Notebook notebook;
+    std::string s;
+    for (int i = 0; i < 11; i++)
+    {
+        s += 'i';
+    }
+    CHECK_THROWS(notebook.write(100000, 3, 90, Direction::Horizontal, s)); // write over the limit of coloumns
+    CHECK_THROWS(notebook.write(1000, 3, 101, Direction::Horizontal, "")); // start at unavailable column
+    CHECK_THROWS(notebook.write(1000, 3, 101, Direction::Vertical, ""));// start at unavailable column
+    for (int i = 0; i < 90; i++)
+    {
+        s += 'i';
+    }
+    CHECK_THROWS(notebook.write(0, 9, 0, Direction::Horizontal, s)); // write over the limit of chars per row
+    CHECK_THROWS(notebook.erase(1, 3, 101, Direction::Vertical, 0)); // unavailable column
+    CHECK_THROWS(notebook.erase(1, 3, 101, Direction::Horizontal, 0));// unavailable column
+    CHECK_THROWS(notebook.erase(5, 2, 9, Direction::Horizontal, 92));// erase over the limit of chars per row
+    CHECK_THROWS(notebook.read(2, 2, 210, Direction::Horizontal, 0));// unavailable column
+    CHECK_THROWS(notebook.read(2, 2, 210, Direction::Vertical, 0));// unavailable column
+    CHECK_THROWS(notebook.read(3, 95, 90, Direction::Horizontal, 11));//read reach to an unavailable column
+    CHECK_THROWS(notebook.write(1000, 3, 100, Direction::Vertical, ""));// unavailable column
+    CHECK_THROWS(notebook.write(1000, 3, 100, Direction::Horizontal, ""));// unavailable column
+    CHECK_THROWS(notebook.read(1000, 3, 100, Direction::Horizontal, 0));// unavailable column
+    CHECK_THROWS(notebook.read(1000, 3, 100, Direction::Vertical, 0));// unavailable column
+    CHECK_THROWS(notebook.erase(1000, 3, 100, Direction::Vertical, 0));// unavailable column
+    CHECK_THROWS(notebook.erase(1000, 3, 100, Direction::Horizontal, 0));// unavailable column
 }

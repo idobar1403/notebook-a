@@ -4,15 +4,15 @@
 using namespace std;
 namespace ariel
 {
-
     void Notebook::putCharAt(unsigned int page_num, unsigned int row, unsigned int col, char c)
     {
         try
         {
             this->notebook.at(page_num).note[col][row] = c;
         }
-        catch(const std::exception& e){
-            cout<<"exception at line 15\n";
+        catch (const std::exception &e)
+        {
+            cout << "exception at line 15\n";
         }
     }
     char Notebook::getChar(unsigned int page_num, unsigned int row, unsigned int col)
@@ -67,7 +67,20 @@ namespace ariel
     }
     void Notebook::write(unsigned int page_num, unsigned int row_num, unsigned int col_num, Direction direction, std::string s)
     {
-        if(this->notebook.count(page_num)==0){
+        if (s.length() < lower_bound || (s.length() >= upper_bound && direction == Direction::Horizontal))
+        {
+            throw invalid_argument("length must be between 0 to 100\n");
+        }
+        if (col_num < lower_bound || col_num >= upper_bound || row_num < lower_bound)
+        {
+            throw invalid_argument("rows and cols must be valid arguments!\n");
+        }
+        if (s.length() + col_num > upper_bound && direction == Direction::Horizontal)
+        {
+            throw invalid_argument("can't reach to column greater than 100\n");
+        }
+        if (this->notebook.count(page_num) == 0)
+        {
             Page page = Page(page_num);
             this->notebook.insert({page_num, page});
         }
@@ -137,59 +150,76 @@ namespace ariel
     }
     std::string Notebook::read(unsigned int page_num, unsigned int row_num, unsigned int col_num, Direction direction, unsigned int length)
     {
-        if(length<lower_bound || (length>upper_bound && direction == Direction::Horizontal)){
+        if (length < lower_bound || (length >= upper_bound && direction == Direction::Horizontal))
+        {
             throw invalid_argument("length must be between 0 to 100\n");
         }
-        if(col_num<lower_bound || col_num>upper_bound || row_num<lower_bound){
+        if (col_num < lower_bound || col_num >= upper_bound || row_num < lower_bound)
+        {
             throw invalid_argument("rows and cols must be valid arguments!\n");
         }
-        if(length+col_num>upper_bound && direction == Direction::Horizontal){
+        if (length + col_num > upper_bound && direction == Direction::Horizontal)
+        {
             throw invalid_argument("can't reach to column greater than 100\n");
         }
         std::string sentance;
-        if(this->notebook.count(page_num)==0){
+        if (this->notebook.count(page_num) == 0)
+        {
             Page page = Page(page_num);
             this->notebook.insert({page_num, page});
         }
-        if(direction==Direction::Vertical){
-            for(unsigned int i=0; i<length; i++){
-                sentance += getChar(page_num, row_num+i, col_num);
+        if (direction == Direction::Vertical)
+        {
+            for (unsigned int i = 0; i < length; i++)
+            {
+                sentance += getChar(page_num, row_num + i, col_num);
             }
         }
-        else{
-            for(unsigned int i=0; i<length; i++){
-                sentance += getChar(page_num, row_num, col_num+i);
+        else
+        {
+            for (unsigned int i = 0; i < length; i++)
+            {
+                sentance += getChar(page_num, row_num, col_num + i);
             }
         }
         return sentance;
     }
     void Notebook::erase(unsigned int page_num, unsigned int row_num, unsigned int col_num, Direction direction, unsigned int length)
     {
-        
-        if(length<lower_bound || (length>upper_bound && direction == Direction::Horizontal)){
+
+        if (length < lower_bound || (length >= upper_bound && direction == Direction::Horizontal))
+        {
             throw invalid_argument("length must be between 0 to 100\n");
         }
-        if(col_num<lower_bound || col_num>upper_bound || row_num<lower_bound){
+        if (col_num < lower_bound || col_num >= upper_bound || row_num < lower_bound)
+        {
             throw invalid_argument("rows and cols must be valid arguments!\n");
         }
-        if(length+col_num>upper_bound && direction == Direction::Horizontal){
+        if (length + col_num > upper_bound && direction == Direction::Horizontal )
+        {
             throw invalid_argument("can't reach to column greater than 100\n");
         }
-        if(this->notebook.count(page_num)==0){
-            throw invalid_argument("can't erase from no exsiting page\n");
+        if (this->notebook.count(page_num) == 0)
+        {
+            Page page = Page(page_num);
+            this->notebook.insert({page_num, page});
         }
-        if(direction==Direction::Vertical){
-            for(unsigned int i=0; i<length; i++){
-                putCharAt(page_num, row_num+i, col_num,'~');
+        if (direction == Direction::Vertical)
+        {
+            for (unsigned int i = 0; i < length; i++)
+            {
+                putCharAt(page_num, row_num + i, col_num, '~');
             }
         }
-        else{
-            for(unsigned int i=0; i<length; i++){
-                putCharAt(page_num, row_num, col_num+i,'~');
+        else
+        {
+            for (unsigned int i = 0; i < length; i++)
+            {
+                putCharAt(page_num, row_num, col_num + i, '~');
             }
         }
     }
-    
+
     void Notebook::show(unsigned int page_num)
     {
     }
