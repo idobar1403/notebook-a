@@ -4,24 +4,24 @@
 using namespace std;
 namespace ariel
 {
-    void Notebook::putCharAt(unsigned int page_num, unsigned int row, unsigned int col, char c)
+    void Notebook::putCharAt(int page_num, int row, int col, char c)
     {
         try
         {
-            this->notebook.at(page_num).note[col][row] = c;
+            this->notebook.at(page_num).note[static_cast<std::vector<int>::size_type>(col)][row] = c;
         }
         catch (const std::exception &e)
         {
             cout << "exception at line 15\n";
         }
     }
-    char Notebook::getChar(unsigned int page_num, unsigned int row, unsigned int col)
+    char Notebook::getChar(int page_num, int row, int col)
     {
         try
         {
-            if (this->notebook.at(page_num).note[col].count(row) == 1)
+            if (this->notebook.at(page_num).note[static_cast<std::vector<int>::size_type>(col)].count(row) == 1)
             {
-                return this->notebook.at(page_num).note[col].at(row);
+                return this->notebook.at(page_num).note[static_cast<std::vector<int>::size_type>(col)].at(row);
             }
             return Notebook::empty_char;
         }
@@ -31,7 +31,7 @@ namespace ariel
             return '_';
         }
     }
-    void Notebook::setRowsCols(unsigned int page_num, unsigned int min_row, unsigned int max_row, unsigned int min_col, unsigned int max_col)
+    void Notebook::setRowsCols(int page_num, int min_row, int max_row, int min_col, int max_col)
     {
         // if (this->notebook.at(page_num).min_row == -1)
         // {
@@ -65,8 +65,12 @@ namespace ariel
             cout << "exception at line 59\n";
         }
     }
-    void Notebook::write(unsigned int page_num, unsigned int row_num, unsigned int col_num, Direction direction, std::string s)
+    void Notebook::write(int page_num, int row_num, int col_num, Direction direction, std::string s)
     {
+        if (page_num < lower_bound || row_num < lower_bound || col_num < lower_bound)
+        {
+            throw invalid_argument("can't work with negative values");
+        }
         if (s.length() < lower_bound || (s.length() >= upper_bound && direction == Direction::Horizontal))
         {
             throw invalid_argument("length must be between 0 to 100\n");
@@ -75,7 +79,7 @@ namespace ariel
         {
             throw invalid_argument("rows and cols must be valid arguments!\n");
         }
-        if (s.length() + col_num > upper_bound && direction == Direction::Horizontal)
+        if ((int)s.length() + col_num > upper_bound && direction == Direction::Horizontal)
         {
             throw invalid_argument("can't reach to column greater than 100\n");
         }
@@ -92,7 +96,7 @@ namespace ariel
         {
             try
             {
-                for (unsigned int i = 0; i < s.length(); i++)
+                for (int i = 0; i < s.length(); i++)
                 {
                     if (getChar(page_num, row_num, col_num + i) != '_')
                     {
@@ -106,10 +110,10 @@ namespace ariel
             }
             try
             {
-                setRowsCols(page_num, row_num, row_num, col_num, col_num + s.length() - 1);
+                setRowsCols(page_num, row_num, row_num, col_num, col_num + (int)s.length() - 1);
                 for (unsigned int j = 0; j < s.length(); j++)
                 {
-                    putCharAt(page_num, row_num, col_num + j, s.at(j));
+                    putCharAt(page_num, row_num, col_num + (int)j, s.at(j));
                 }
             }
             catch (const std::exception &e)
@@ -121,7 +125,7 @@ namespace ariel
         {
             try
             {
-                for (unsigned int i = 0; i < s.length(); i++)
+                for (int i = 0; i < s.length(); i++)
                 {
                     if (getChar(page_num, row_num + i, col_num) != '_')
                     {
@@ -136,10 +140,10 @@ namespace ariel
             }
             try
             {
-                setRowsCols(page_num, row_num, row_num + s.length() - 1, col_num, col_num);
+                setRowsCols(page_num, row_num, row_num + (int)s.length() - 1, col_num, col_num);
                 for (unsigned int j = 0; j < s.length(); j++)
                 {
-                    putCharAt(page_num, row_num + j, col_num, s.at(j));
+                    putCharAt(page_num, row_num + (int)j, col_num, s.at(j));
                 }
             }
             catch (const std::exception &e)
@@ -148,8 +152,12 @@ namespace ariel
             }
         }
     }
-    std::string Notebook::read(unsigned int page_num, unsigned int row_num, unsigned int col_num, Direction direction, unsigned int length)
+    std::string Notebook::read(int page_num, int row_num, int col_num, Direction direction, int length)
     {
+        if (page_num < lower_bound || row_num < lower_bound || col_num < lower_bound || length < lower_bound)
+        {
+            throw invalid_argument("can't work with negative values");
+        }
         if (length < lower_bound || (length >= upper_bound && direction == Direction::Horizontal))
         {
             throw invalid_argument("length must be between 0 to 100\n");
@@ -170,22 +178,26 @@ namespace ariel
         }
         if (direction == Direction::Vertical)
         {
-            for (unsigned int i = 0; i < length; i++)
+            for (int i = 0; i < length; i++)
             {
                 sentance += getChar(page_num, row_num + i, col_num);
             }
         }
         else
         {
-            for (unsigned int i = 0; i < length; i++)
+            for (int i = 0; i < length; i++)
             {
                 sentance += getChar(page_num, row_num, col_num + i);
             }
         }
         return sentance;
     }
-    void Notebook::erase(unsigned int page_num, unsigned int row_num, unsigned int col_num, Direction direction, unsigned int length)
+    void Notebook::erase(int page_num, int row_num, int col_num, Direction direction, int length)
     {
+        if (page_num < lower_bound || row_num < lower_bound || col_num < lower_bound || length < lower_bound)
+        {
+            throw invalid_argument("can't work with negative values");
+        }
 
         if (length < lower_bound || (length >= upper_bound && direction == Direction::Horizontal))
         {
@@ -195,7 +207,7 @@ namespace ariel
         {
             throw invalid_argument("rows and cols must be valid arguments!\n");
         }
-        if (length + col_num > upper_bound && direction == Direction::Horizontal )
+        if (length + col_num > upper_bound && direction == Direction::Horizontal)
         {
             throw invalid_argument("can't reach to column greater than 100\n");
         }
@@ -206,21 +218,21 @@ namespace ariel
         }
         if (direction == Direction::Vertical)
         {
-            for (unsigned int i = 0; i < length; i++)
+            for (int i = 0; i < length; i++)
             {
                 putCharAt(page_num, row_num + i, col_num, '~');
             }
         }
         else
         {
-            for (unsigned int i = 0; i < length; i++)
+            for (int i = 0; i < length; i++)
             {
                 putCharAt(page_num, row_num, col_num + i, '~');
             }
         }
     }
 
-    void Notebook::show(unsigned int page_num)
+    void Notebook::show(int page_num)
     {
     }
 }

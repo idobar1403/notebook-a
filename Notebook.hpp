@@ -7,13 +7,13 @@
 #include "Direction.hpp"
 struct Page
 {
-    std::vector<std::unordered_map<unsigned int, char>> note;
-    unsigned int page_number;
-    unsigned int min_row;
-    unsigned int max_row;
-    unsigned int min_col;
-    unsigned int max_col;
-    Page(unsigned int page_num): note(std::vector<std::unordered_map<unsigned int, char>>(100))
+    std::vector<std::unordered_map<int, char>> note;
+    int page_number;
+    int min_row;
+    int max_row;
+    int min_col;
+    int max_col;
+    Page(int page_num) : note(std::vector<std::unordered_map<int, char>>(100))
     {
         page_number = page_num;
         min_row = 0;
@@ -30,17 +30,18 @@ namespace ariel
     {
     private:
         char empty_char = '_';
-        unsigned int upper_bound = 100;
-        unsigned int lower_bound = 0;
-        std::unordered_map<unsigned int,Page> notebook;
-        void putCharAt(unsigned int page_num, unsigned int row, unsigned int col, char c);
-        char getChar(unsigned int page_num, unsigned int row, unsigned int col);
-        void setRowsCols(unsigned int page_num, unsigned int min_row, unsigned int max_row, unsigned int min_col, unsigned int max_col);
+        int upper_bound = 100;
+        int lower_bound = 0;
+        std::unordered_map<int, Page> notebook;
+        void putCharAt(int page_num, int row, int col, char c);
+        char getChar(int page_num, int row, int col);
+        void setRowsCols(int page_num, int min_row, int max_row, int min_col, int max_col);
+
     public:
-        void write(unsigned int page_num, unsigned int row_num, unsigned int col_num, Direction direction, std::string s);
-        std::string read(unsigned int page_num, unsigned int row_num, unsigned int col_num, Direction direction, unsigned int length);
-        void erase(unsigned int page_num, unsigned int row_num, unsigned int col_num, Direction direction, unsigned int length);
-        void show(unsigned int page_num);
+        void write(int page_num, int row_num, int col_num, Direction direction, std::string s);
+        std::string read(int page_num, int row_num, int col_num, Direction direction, int length);
+        void erase(int page_num, int row_num, int col_num, Direction direction, int length);
+        void show(int page_num);
     };
 }
 #endif
