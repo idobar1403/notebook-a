@@ -96,9 +96,11 @@ namespace ariel
         {
             try
             {
-                for (int i = 0; i < s.length(); i++)
+                for (unsigned int i = 0; i < s.length(); i++)
                 {
-                    if (getChar(page_num, row_num, col_num + i) != '_')
+                    char c = getChar(page_num, row_num + (int)i, col_num);
+                    char string_char = s.at(i);
+                    if (c != '_' || string_char == '~')
                     {
                         throw invalid_argument("cannot override already written char\n");
                     }
@@ -125,9 +127,11 @@ namespace ariel
         {
             try
             {
-                for (int i = 0; i < s.length(); i++)
+                for (unsigned int i = 0; i < s.length(); i++)
                 {
-                    if (getChar(page_num, row_num + i, col_num) != '_')
+                    char c = getChar(page_num, row_num + (int)i, col_num);
+                    char string_char = s.at(i);
+                    if (c != '_' || string_char == '~')
                     {
                         throw invalid_argument("cannot override already written char\n");
                     }
@@ -153,17 +157,13 @@ namespace ariel
     }
     std::string Notebook::read(int page_num, int row_num, int col_num, Direction direction, int length)
     {
-        if (page_num < lower_bound || row_num < lower_bound || col_num < lower_bound || length < lower_bound)
+        if (page_num < lower_bound || row_num < lower_bound || col_num < lower_bound || col_num >= upper_bound)
         {
             throw invalid_argument("can't work with negative values");
         }
         if (length < lower_bound || (length >= upper_bound && direction == Direction::Horizontal))
         {
             throw invalid_argument("length must be between 0 to 100\n");
-        }
-        if (col_num < lower_bound || col_num >= upper_bound || row_num < lower_bound)
-        {
-            throw invalid_argument("rows and cols must be valid arguments!\n");
         }
         if (length + col_num > upper_bound && direction == Direction::Horizontal)
         {
@@ -193,7 +193,7 @@ namespace ariel
     }
     void Notebook::erase(int page_num, int row_num, int col_num, Direction direction, int length)
     {
-        if (page_num < lower_bound || row_num < lower_bound || col_num < lower_bound)
+        if (page_num < lower_bound || row_num < lower_bound || col_num < lower_bound || col_num >= upper_bound)
         {
             throw invalid_argument("can't work with negative values");
         }
@@ -201,10 +201,6 @@ namespace ariel
         if (length < lower_bound || (length >= upper_bound && direction == Direction::Horizontal))
         {
             throw invalid_argument("length must be between 0 to 100\n");
-        }
-        if (col_num < lower_bound || col_num >= upper_bound || row_num < lower_bound)
-        {
-            throw invalid_argument("rows and cols must be valid arguments!\n");
         }
         if (length + col_num > upper_bound && direction == Direction::Horizontal)
         {
