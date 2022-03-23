@@ -18,7 +18,28 @@ TEST_CASE("Good Writing and reading tests")
     CHECK_NOTHROW(notebook.write(20000, 2900, 0, Direction::Horizontal, ""));           // write empty string
     CHECK_NOTHROW(notebook.write(20000, 2900, 99, Direction::Horizontal, "1"));         // check that get no errors on writing on edge
     CHECK(notebook.read(20000, 2900, 0, Direction::Horizontal, 3) == "___");            // read non written entries
-    CHECK_NOTHROW(notebook.read(0,0,0,Direction::Horizontal,0));                        // nothing to read
+    CHECK_NOTHROW(notebook.read(0, 0, 0, Direction::Horizontal, 0));                    // nothing to read
+    std::string s;
+    std::string s2;
+    for (int i = 0; i < 60; i++) //horizontal writing loop
+    {   
+        CHECK_NOTHROW(notebook.write(1, 2900, i, Direction::Horizontal, "y"));
+        s2="";
+        for (int j = 0; j < i; j++) // horizontal reading loop
+        {   
+            s2+='y';
+            CHECK(notebook.read(1,2900,0,Direction::Horizontal,j+1)==s2);
+        }
+        CHECK(notebook.read(1,2900,0,Direction::Horizontal,i)==s);
+        s += 'y';
+    }
+    std::string s3;
+    for (int i = 0; i < 120; i++) // vertical writing and reading loop, more than 100 chars 
+    {
+        s3 += 'y';
+        CHECK_NOTHROW(notebook.write(2, i, 0, Direction::Vertical, "y"));
+        CHECK(notebook.read(2,0,0,Direction::Vertical,i+1)==s3); 
+    }
 }
 TEST_CASE("Good erase tests")
 {
@@ -42,8 +63,25 @@ TEST_CASE("Good erase tests")
     CHECK(notebook.read(1000, 30, 50, Direction::Vertical, 40) == s);            // check that it's actually got deleted
     CHECK_NOTHROW(notebook.erase(30, 10, 90, Direction::Horizontal, 10));        // erase some chars
     CHECK(notebook.read(30, 10, 90, Direction::Horizontal, 10) == "~~~~~~~~~~"); // check that it's actually got deleted
-    CHECK_NOTHROW(notebook.erase(0,0,0,Direction::Horizontal,0)); // empty length to erase
-
+    CHECK_NOTHROW(notebook.erase(0, 0, 0, Direction::Horizontal, 0));            // empty length to erase
+    std::string s1;
+    for (int i = 0; i < 100; i++) //horizontal erase loop
+    {   
+        CHECK_NOTHROW(notebook.erase(1, 2900, i, Direction::Horizontal, 1));
+        CHECK(notebook.read(1,2900,0,Direction::Horizontal,i)==s1);
+        s1 += '~';
+    }
+    std::string s2;
+    for (int i = 0; i < 50; i++) // vertical erase loop, more than 100 chars 
+    {
+        CHECK_NOTHROW(notebook.erase(2, i, 0, Direction::Vertical, i+1));
+        s2="";
+        for (int j = 0; j < 2*i-1; j++) //vertical read loop, more than 100 chars
+        {   
+            s2+='~';
+            CHECK(notebook.read(2,0,0,Direction::Vertical,j+1)==s2);
+        }
+    }
 }
 TEST_CASE("Bad inputs")
 {
@@ -85,6 +123,32 @@ TEST_CASE("Negative inputs")
     CHECK_THROWS(notebook.read(-1, 9, 0, Direction::Horizontal, 3));         // negative argument
     CHECK_THROWS(notebook.read(1, 9, -30, Direction::Vertical, 0));          // negative argument
     CHECK_THROWS(notebook.read(1, 9, 30, Direction::Horizontal, -9));        // negative length to read
-    CHECK_THROWS(notebook.erase(-1, 9, 0, Direction::Vertical, 40));          // negative argument
+    CHECK_THROWS(notebook.erase(-1, 9, 0, Direction::Vertical, 40));         // negative argument
     CHECK_THROWS(notebook.erase(1, 9, 0, Direction::Horizontal, -6));        // negative length to erase
+}
+TEST_CASE("Write over written or deleted entries")
+{
+    ariel::Notebook notebook;
+    for (int page = 0; page < 10; page++)
+    {
+        for (int row = 0; row < 10; row++)
+        {
+            for (int col = 0; col < 40; col++)
+            {
+                CHECK_NOTHROW(notebook.write(page,row,col,Direction::Horizontal,"f" )); // write one char
+                CHECK_THROWS(notebook.write(page,row,col,Direction::Horizontal,"a" ));// can't write if already written at the entry
+            }
+        }
+    }
+    for (int page = 0; page < 10; page++)
+    {
+        for (int row = 0; row < 10; row++)
+        {
+            for (int col = 0; col < 40; col++)
+            {
+                CHECK_NOTHROW(notebook.erase(page,row,col,Direction::Horizontal,1 ));// erase one char
+                CHECK_THROWS(notebook.write(page,row,col,Direction::Horizontal,"a" ));// can't write on deleted entry
+            }
+        }
+    }
 }

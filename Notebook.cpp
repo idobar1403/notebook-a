@@ -100,13 +100,13 @@ namespace ariel
                 {
                     if (getChar(page_num, row_num, col_num + i) != '_')
                     {
-                        throw invalid_argument("cannot reach the given place in the notebook\n");
+                        throw invalid_argument("cannot override already written char\n");
                     }
                 }
             }
             catch (const std::exception &e)
             {
-                cout << "exception at line 88\n";
+                throw invalid_argument("cannot override already written char\n");
             }
             try
             {
@@ -135,8 +135,7 @@ namespace ariel
             }
             catch (const std::exception &e)
             {
-                cout << "cannot override already written char\n";
-                return;
+                throw invalid_argument("cannot override already written char\n");
             }
             try
             {
@@ -194,7 +193,7 @@ namespace ariel
     }
     void Notebook::erase(int page_num, int row_num, int col_num, Direction direction, int length)
     {
-        if (page_num < lower_bound || row_num < lower_bound || col_num < lower_bound || length < lower_bound)
+        if (page_num < lower_bound || row_num < lower_bound || col_num < lower_bound)
         {
             throw invalid_argument("can't work with negative values");
         }
