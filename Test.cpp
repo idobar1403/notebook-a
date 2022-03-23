@@ -113,8 +113,8 @@ TEST_CASE("Bad inputs")
     CHECK_THROWS(notebook.read(1000, 3, 100, Direction::Vertical, 0));     // unavailable column
     CHECK_THROWS(notebook.erase(1000, 3, 100, Direction::Vertical, 0));    // unavailable column
     CHECK_THROWS(notebook.erase(1000, 3, 100, Direction::Horizontal, 0));  // unavailable column
-    CHECK_THROWS(notebook.write(3, 3, 3, Direction::Horizontal, "abc~def"));
-    CHECK_THROWS(notebook.write(3, 3, 3, Direction::Vertical, "abc~def"));
+    CHECK_THROWS(notebook.write(3, 3, 3, Direction::Horizontal, "abc~def")); // cant write '~', onlt at erase
+    CHECK_THROWS(notebook.write(3, 3, 3, Direction::Vertical, "abc~def")); // cant write '~', onlt at erase
 }
 TEST_CASE("Negative inputs")
 {
