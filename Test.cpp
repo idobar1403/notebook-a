@@ -21,7 +21,7 @@ TEST_CASE("Good Writing and reading tests")
     CHECK_NOTHROW(notebook.read(0, 0, 0, Direction::Horizontal, 0));                    // nothing to read
     std::string s;
     std::string s2;
-    for (int i = 0; i < 60; i++) // horizontal writing loop
+    for (int i = 0; i < 30; i++) // horizontal writing loop
     {
         CHECK_NOTHROW(notebook.write(1, 2900, i, Direction::Horizontal, "y"));
         s2 = "";
@@ -115,6 +115,15 @@ TEST_CASE("Bad inputs")
     CHECK_THROWS(notebook.erase(1000, 3, 100, Direction::Horizontal, 0));  // unavailable column
     CHECK_THROWS(notebook.write(3, 3, 3, Direction::Horizontal, "abc~def")); // cant write '~', onlt at erase
     CHECK_THROWS(notebook.write(3, 3, 3, Direction::Vertical, "abc~def")); // cant write '~', onlt at erase
+    for(int h=0;h<32;h++){ // check throw for char that smaller than 32
+        char c = h;
+        std::string s="";
+        s+=c;
+        CHECK_THROWS(notebook.write(3, 3, 3, Direction::Vertical, s)); // can't write non written char
+    }
+    CHECK_THROWS(notebook.write(3, 3, 3, Direction::Vertical, "abc\ndef")); // cant write '\n'
+    CHECK_THROWS(notebook.write(3, 3, 3, Direction::Vertical, "abc\rdef")); // cant write '\r'
+    CHECK_THROWS(notebook.write(3, 3, 3, Direction::Vertical, "abc\tdef")); // cant write '\t'
 }
 TEST_CASE("Negative inputs")
 {
@@ -133,22 +142,22 @@ TEST_CASE("Negative inputs")
 TEST_CASE("Write over written or deleted entries")
 {
     ariel::Notebook notebook;
-    for (int page = 0; page < 10; page++)
+    for (int page = 0; page < 8; page++)
     {
         for (int row = 0; row < 10; row++)
         {
-            for (int col = 0; col < 40; col++)
+            for (int col = 0; col < 30; col++)
             {
                 CHECK_NOTHROW(notebook.write(page, row, col, Direction::Horizontal, "f")); // write one char
                 CHECK_THROWS(notebook.write(page, row, col, Direction::Horizontal, "a"));  // can't write if already written at the entry
             }
         }
     }
-    for (int page = 0; page < 10; page++)
+    for (int page = 0; page < 8; page++)
     {
         for (int row = 0; row < 10; row++)
         {
-            for (int col = 0; col < 40; col++)
+            for (int col = 0; col < 30; col++)
             {
                 CHECK_NOTHROW(notebook.erase(page, row, col, Direction::Horizontal, 1));  // erase one char
                 CHECK_THROWS(notebook.write(page, row, col, Direction::Horizontal, "a")); // can't write on deleted entry

@@ -83,6 +83,9 @@ namespace ariel
         {
             throw invalid_argument("can't reach to column greater than 100\n");
         }
+        if(s.find("\n")<s.length()||s.find("\t")<s.length()||s.find("\r")<s.length()){
+            throw invalid_argument("bad input\n");
+        }
         if (this->notebook.count(page_num) == 0)
         {
             Page page = Page(page_num);
@@ -94,22 +97,20 @@ namespace ariel
         }
         if (direction == Direction::Horizontal)
         {
-            try
-            {
+            
                 for (unsigned int i = 0; i < s.length(); i++)
                 {
                     char c = getChar(page_num, row_num + (int)i, col_num);
                     char string_char = s.at(i);
+                    if(string_char < 32 || string_char > 126){
+                        throw invalid_argument("can't put these chars\n");
+                    }
                     if (c != '_' || string_char == '~')
                     {
                         throw invalid_argument("cannot override already written char\n");
                     }
                 }
-            }
-            catch (const std::exception &e)
-            {
-                throw invalid_argument("cannot override already written char\n");
-            }
+            
             try
             {
                 setRowsCols(page_num, row_num, row_num, col_num, col_num + (int)s.length() - 1);
@@ -125,22 +126,18 @@ namespace ariel
         }
         else
         {
-            try
-            {
                 for (unsigned int i = 0; i < s.length(); i++)
                 {
                     char c = getChar(page_num, row_num + (int)i, col_num);
                     char string_char = s.at(i);
+                    if(string_char < 32 || string_char > 126){
+                        throw invalid_argument("can't put these chars\n");
+                    }
                     if (c != '_' || string_char == '~')
                     {
                         throw invalid_argument("cannot override already written char\n");
                     }
                 }
-            }
-            catch (const std::exception &e)
-            {
-                throw invalid_argument("cannot override already written char\n");
-            }
             try
             {
                 setRowsCols(page_num, row_num, row_num + (int)s.length() - 1, col_num, col_num);
